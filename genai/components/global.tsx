@@ -70,4 +70,5 @@ export function useDynamicMemoStyles<R extends DStyles>(f:()=>R,deps:React.Depen
 export const {width: ScreenWidth, height: ScreenHeight } = Dimensions.get('screen');
 
 export const getScreenPercentageNumber = (percent:number)=>(percent/100)*ScreenWidth;
+export const getScreenHeightPercentageNumber = (percent:number)=>(percent/100)*ScreenHeight;
 
