@@ -82,7 +82,25 @@ const ImageContent = ()=>{
     return null
 }
 
-
+export const ProfileImage = ()=>{
+    const {white, searchBar, fadedBlack, neutral} = useTheme().colors;
+    const dynamicStyles = useDynamicMemoStyles(()=>{
+        return {
+           
+            articleAuthorProfile: [
+                styles.articleAuthorProfile,
+                {
+                    backgroundColor: searchBar
+                }
+            ]
+        }
+    },[])
+    return (
+        <View style={dynamicStyles.articleAuthorProfile} >
+            <ImageContent />
+        </View>
+    )
+}
 
 
 const styles = StyleSheet.create({
