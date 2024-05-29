@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, TextInput, View } from "react-native"
 import { getScreenPercentageNumber, useDynamicMemoStyles } from "./global";
 import { useTheme } from "@/constants/Theme";
 import { Feather } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export const SearchBar = ()=>{
     const {searchBar,fadedBlack} = useTheme().colors;
@@ -37,7 +38,26 @@ export const SearchBar = ()=>{
     )
 }
 
-const searchBarWidthPercentage = 90;
+export const SearchBarSpace = ()=>{
+    const { white, black } = useTheme().colors;
+    const dynamicStyles = useDynamicMemoStyles(()=>{
+  
+      return {
+        container: {
+          backgroundColor: white,
+          paddingBottom: 10,
+        }
+      }
+    },[white])
+  
+    return (
+      <SafeAreaView style={dynamicStyles.container} >
+        <SearchBar />
+      </SafeAreaView>
+    )
+  }
+
+const searchBarWidthPercentage = 93;
 const searchBarHeight = 35;
 const searchStyle = StyleSheet.create({
     outerMost: {
@@ -63,3 +83,5 @@ const searchStyle = StyleSheet.create({
         justifyContent: 'center'
     }
 })
+
+
