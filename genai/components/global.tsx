@@ -5,6 +5,8 @@
 import { useTheme } from "@/constants/Theme"
 import { useMemo } from "react"
 import { Dimensions, Text as NativeText, StyleProp, TextStyle, ViewStyle, type TextProps } from "react-native"
+import { Scrollable } from "./dist"
+// import { Scrollable } from "react-native-paging-swipper"
 
 
 
@@ -71,4 +73,23 @@ export const {width: ScreenWidth, height: ScreenHeight } = Dimensions.get('scree
 
 export const getScreenPercentageNumber = (percent:number)=>(percent/100)*ScreenWidth;
 export const getScreenHeightPercentageNumber = (percent:number)=>(percent/100)*ScreenHeight;
+export const overlayControl: {show:(show:boolean)=>void} = {} as any;
+export const tabScreenScrollPositions: {[k:string]: {positionY:number;setScreenScrollPosition:(position:number,animate?:boolean)=>void}} = {} as any;
+export const currentActiveTab = {name: ''}
+export const itemPaged: {
+    onPage: {[k:string]: ((isPaged: boolean)=>void)};
+    onTabOnly: {[k:string]: ((isPaged: boolean)=>void)}
+  } = {onPage: {}, onTabOnly: {}} as any;
+export const mainScreen: {
+    positionY: number;
+    scrollTo?:(yIndex:number)=>void;
+    onScroll: {[k:string]: ((positionY: number)=>void)}
+  } = {positionY: 0, onScroll: {}} as any;
 
+  export const tabButtons = [
+    {name: 'Explore'}, {name: 'Science'} , {name: 'History'}, 
+    {name: 'Programming'}, {name: 'Mathematics'}, 
+    {name: 'Web design'}, {name: 'Mobile app dev'}
+  ]
+
+export const scrollable = Scrollable.getGestureData();

@@ -1,6 +1,6 @@
 import { Article, ProfileImage } from '@/components/article';
 import { Button } from '@/components/button';
-import { Heading, getScreenHeightPercentageNumber, useDynamicMemoStyles } from '@/components/global';
+import { Heading, currentActiveTab, getScreenHeightPercentageNumber, itemPaged, mainScreen, overlayControl, tabScreenScrollPositions, useDynamicMemoStyles } from '@/components/global';
 import { ScreenHeader } from '@/components/screenhead';
 import { SearchBar, SearchBarSpace } from '@/components/search';
 import { useTheme } from '@/constants/Theme';
@@ -20,15 +20,15 @@ const dummyArticleData = {
 
 let enableScroll = false;
 const scrollable = Scrollable.getGestureData();
-const mainScreen: {
-  positionY: number;
-  scrollTo?:(yIndex:number)=>void;
-  onScroll: {[k:string]: ((positionY: number)=>void)}
-} = {positionY: 0, onScroll: {}} as any;
+
 export default function HomeScreen() {
   const {background,white, neutral} = useTheme().colors;
   const [scrollTabScreens,setScrollTabScreens] = useState(false)
   const ref = useRef<ScrollView>(null);
+  const [scroll,setScroll] = useState(true);
+  itemPaged.onPage.mainScreen = (isPaged)=>{
+    setScroll(!isPaged);
+  };
   mainScreen.scrollTo = (y)=>ref.current?.scrollTo({animated: !true,x:0,y:y});
   // enableScroll = scrollTabScreens;
   return (
@@ -37,8 +37,9 @@ export default function HomeScreen() {
 
       </Scrollable.ScrollViewScreenContainer> */}
       <ScrollView
+        scrollEnabled={scroll}
         ref={ref}
-        stickyHeaderIndices={[1]}
+        stickyHeaderIndices={scroll?[0]:undefined}
         showsVerticalScrollIndicator={false}
         onScroll={(e)=>{
           mainScreen.positionY = e.nativeEvent.contentOffset.y;
@@ -55,9 +56,10 @@ export default function HomeScreen() {
           // }
         }}
       >
-        <Greetings />
-        <SearchBarSpace />
-        <ButtonTabs />
+        { scroll&& <Greetings />}
+        { scroll&& <SearchBarSpace />}
+        { scroll&& <ButtonTabs />}
+
         <TopTabScreens />
       </ScrollView>
       {/* <FlatList 
@@ -75,13 +77,16 @@ export default function HomeScreen() {
 }
 
 const TopTabScreens = ()=>{
-
+  useEffect(()=>{
+    !currentActiveTab.name&&(currentActiveTab.name = tabButtons[0].name);
+  },[])
   return (
     <NestedFlatListScreenContainer
       onScreen={(index)=>{
-        (scrollPositions as any).fresh = true;
+        (tabScreenScrollPositions as any).fresh = true;
+        currentActiveTab.name = tabButtons[0].name
         // const tabName = tabButtons[index-1].name;
-        // const tabData = scrollPositions[tabName];
+        // const tabData = tabScreenScrollPositions[tabName];
         // if(tabData&&tabData.setScreenScrollPosition){
         //   tabData.setScreenScrollPosition(tabData.positionY);
         // }
@@ -101,44 +106,63 @@ const TopTabScreens = ()=>{
 
 const halfHeight = getScreenHeightPercentageNumber(30);
 const topHeight = getScreenHeightPercentageNumber(20);
-const scrollPositions: {[k:string]: {positionY:number;setScreenScrollPosition?:(position:number)=>void}} = {} as any;
+
+
 
 function TabScreen({item}:{item: typeof tabButtons['0']}) {
   const {background,white, neutral} = useTheme().colors;
-  const [data,setData] = useState((new Array(4)).fill(dummyArticleData,3));
-  const [scroll,setScroll] = useState(enableScroll);
+  const [data,setData] = useState((new Array(5)).fill(dummyArticleData));
+  const [scroll,setScroll] = useState(true);
+  // const lastIndex = data.length-1;
   const ref = useRef<FlatList>(null);
+  
   // enableScroll = scroll;
   const {name:tabName} = item;
-  if(!scrollPositions[tabName]){
-    scrollPositions[tabName] = {
+  if(!tabScreenScrollPositions[tabName]){
+    tabScreenScrollPositions[tabName] = {
       positionY: 0,
-      setScreenScrollPosition: (position)=>{
-        ref.current?.scrollToOffset({animated: false, offset: position});
+      setScreenScrollPosition: (position,animate)=>{
+        ref.current?.scrollToOffset({animated: !!animate, offset: position});
         // mainScreen.scrollTo&&mainScreen.scrollTo(position)
       }
     };
   }
+  itemPaged.onTabOnly[tabName] = (isPaged)=>{
+    setScroll(!isPaged);
+  };
   
+  // overlayControl.show = (s)=>{
+  //   console.log(s);
+    
+  //   setOverlayDisplay(!!s);
+  // };
   
   
   return (
-    <View style={[styles.container,{backgroundColor:white}]}>
+    <View style={[styles.container,{backgroundColor:neutral}]}>
       {/* <Scrollable.ScrollViewScreenContainer horizontal={true} gestureData={scrollable} >
 
       </Scrollable.ScrollViewScreenContainer> */}
-      
+      {/* <View style={{backgroundColor: 'rgba(0,0,0)',position: 'absolute',top:0,bottom:0,right: 0, left:0}}></View> */}
       <FlatList 
         // initialNumToRender={4}
-        // scrollEnabled={scroll}
+        scrollEnabled={scroll}
         ref={ref}
         data={data}
-        renderItem={RenderTabScreenItem}
+        renderItem={({index,item})=>{
+          return <Article {...item} />
+          // index!==lastIndex?<Article {...item} />: <Overlay/>
+        }}
         // stickyHeaderIndices={[1]}
         keyExtractor={(item,index)=>`${index}`}
         onEndReached={({distanceFromEnd})=>{}}
         onEndReachedThreshold={0.7}
-        ListFooterComponent={<ActivityIndicator size='small' style={{marginTop: 15,marginBottom: 5}} />}
+        ListFooterComponent={
+          <>
+            <ActivityIndicator size='small' style={{marginTop: 15,marginBottom: 5}} />
+            
+          </>
+        }
         onRefresh={()=>{
           // if(enableScroll){
           //   setScroll(false);
@@ -146,14 +170,14 @@ function TabScreen({item}:{item: typeof tabButtons['0']}) {
         }}
         refreshing={!false}
         onScroll={(e)=>{
-          const tabData: any = scrollPositions[tabName];
+          const tabData: any = tabScreenScrollPositions[tabName];
           const positionY = tabData.positionY;
           // Sync our Flatlist scroll position with our main screen's Scrollview position
           const yLength = e.nativeEvent.contentOffset.y;
           // yLength = yLength<0?0:yLength;
           // Math.abs(
             
-          //   // - ((scrollPositions as any).fresh? mainScreen.positionY: 0)
+          //   // - ((tabScreenScrollPositions as any).fresh? mainScreen.positionY: 0)
           // );
           if(mainScreen.positionY>125){
             mainScreen.positionY = 125;
@@ -165,14 +189,37 @@ function TabScreen({item}:{item: typeof tabButtons['0']}) {
             
             mainScreen.scrollTo&&mainScreen.scrollTo(mainScrollSize<0?0:mainScrollSize);
 
-            // +(true||(scrollPositions as any).fresh?mainScreen.positionY:0)
+            // +(true||(tabScreenScrollPositions as any).fresh?mainScreen.positionY:0)
           }
           tabData.positionY = yLength;
-          (scrollPositions as any).fresh = false;
+          (tabScreenScrollPositions as any).fresh = false;
         }}
       />
+      {/* <View style={{backgroundColor: 'rgba(0,0,0)',position: 'absolute',top:0,bottom:0,right: 0, left:0}}></View> */}
+      
     </View>
   );
+}
+
+const Overlay = ({showOverlay}:{showOverlay:boolean})=>{
+  // const [showOverlay,setOverlayDisplay] = useState(false);
+  // useEffect(()=>{
+  //   overlayControl.show = (s)=>{
+  //     // console.log(s);
+      
+  //     setOverlayDisplay(s);
+  //   };
+  // },[showOverlay])
+  
+  
+  if(!showOverlay){
+    return null;
+  }
+  // console.log(showOverlay);
+  // if(!showOverlay){}
+  return (
+    <View style={{backgroundColor: 'rgba(0,0,0)',position: 'absolute',top:0,bottom:0,right: 0, left:0}}></View>
+  )
 }
 
 const RenderTabScreenItem: ListRenderItem<any> = ({index,item})=>{
@@ -205,6 +252,7 @@ const Greetings = ()=>{
         backgroundColor: white,
         paddingHorizontal: 20,
         alignItems: 'center',
+        // marginTop: -10
 
       },
       // greeting: [
@@ -218,44 +266,59 @@ const Greetings = ()=>{
   useEffect(()=>{
     mainScreen.onScroll.greeting = (value)=>{
       
-      if(value<1){
-        value = 1;
-      }
-      let scroll = value/125;
-      if(scroll>1){
-        scroll = 1;
-      }
-      let val = 1 - scroll;
-      if(val<0.77&&val>0.5){
-        val = val - 0.4
-      }
+      // if(value<1){
+      //   value = 1;
+      // }
+      // let scroll = value/125;
+      // if(scroll>1){
+      //   scroll = 1;
+      // }
+      // let val = 1 - scroll;
+      // if(val<0.77&&val>0.5){
+      //   val = val - 0.4
+      // }
      
       
-      if(scrollValue<0.8&&val<0.8){return}
-      // console.log(val);
-      setScrollValue(Math.abs(val));
+      // if(scrollValue<0.8&&val<0.8){return}
+      // // console.log(val);
+      // setScrollValue(Math.abs(val));
+      setScrollValue(value>120?1:0)
+    }
+    itemPaged.onPage.greeting = (siPaged)=>{
+
     }
     return ()=>{
       mainScreen.onScroll.greeting = null as any;
+      itemPaged.onPage.greeting = null as any;
     }
   },[scrollValue])
   
   return (
     <View style={dynamicStyles.container}>
-      <SafeAreaView style={[styles.greeting,{opacity: scrollValue,borderBottomColor:neutral,borderBottomWidth:1,paddingBottom: 5}]}>
+      <SafeAreaView style={[styles.greeting,{borderBottomColor:neutral,borderBottomWidth:1,paddingBottom: 5}]}>
           <View style={{flexDirection: 'row',alignItems: 'center'}}>
             <Pressable style={{marginRight: 10}} onPress={undefined} >
                 <Feather size={26} color={fadedBlack} name='menu' />
             </Pressable>
             
-            <View>
-                {/* <ProfileImage /> */}
-                <Heading type='h3'>{'Welcome Bismark!'}</Heading>
+            <View style={{flexDirection: 'row',alignItems: 'center'}}>
+                {/* <ProfileImage width={35} height={35} />
+                <Heading type='h4'>{'@KBismark!'}</Heading> */}
+                <Button active={true} title='Log in' style={{paddingVertical: 8,paddingHorizontal: 20}} />
             </View>
           </View>
-          <Pressable onPress={undefined} >
-              <Feather size={26} color={fadedBlack} name='settings' />
-          </Pressable>
+          <View style={{flexDirection: 'row',alignItems: 'center'}}>
+              {
+                !!scrollValue &&
+                <Pressable onPress={undefined} style={{backgroundColor: neutral, borderRadius: 50,width: 35,height: 35,flexDirection: 'row',justifyContent:'center',alignItems: 'center',marginRight: 15}}>
+                  <Feather size={26} color={fadedBlack} name='search' />
+              </Pressable>
+              }
+            <Pressable onPress={undefined} style={{backgroundColor: neutral, borderRadius: 50,width: 35,height: 35,flexDirection: 'row',justifyContent:'center', alignItems: 'center'}} >
+                <Feather size={26} color={fadedBlack} name='settings' />
+            </Pressable>
+          </View>
+          
       </SafeAreaView>
     </View>
   )
