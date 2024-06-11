@@ -31,6 +31,7 @@ const Articles = React.memo(({imageSrc, title, caption, onSave, onView }: Articl
         x:0,y:0,width:0,height:0,pageX:0,pageY:0,
     });
     const ref = useRef<View>(null);
+    
     const dynamicStyles = useDynamicMemoStyles(()=>{
         return {
             container: {
@@ -223,7 +224,7 @@ const Articles = React.memo(({imageSrc, title, caption, onSave, onView }: Articl
                     <View style = {dynamicStyles.articleContainer} >
                         <View style={dynamicStyles.imageSpace}>
                             <ActivityIndicator size='small' />
-                            <ImageContent />
+                            <ImageView uri={imageSrc} />
                         </View>
                         <LinearGradient style={styles.gradient}  start={gradientStops.start} end={gradientStops.end} colors={gradientColors}>
                             <View style={styles.summarry}>

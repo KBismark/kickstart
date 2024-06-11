@@ -6,19 +6,43 @@ console.log(API_KEY);
 
 const genAI = new GoogleGenerativeAI(API_KEY as string);
 
-export async function askAI() {
+export async function askAI(question:string) {
   // The Gemini 1.5 models are versatile and work with both text-only and multimodal prompts
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
 
-  const prompt = "Write a blog about a magic backpack. Add sources to a related image to be displayed to users."
-    console.log(876);
+  const prompt = `Write maximum 5 random and different blogs about ${question} in JSON format with the following typescript type structure:
+
+{
+  "title": String,
+  introduction: "... (content overview here) ...",
+  tags: String[],
+  sources-of-content-if-any: String[],
+  "body": {
+      "subTitle": String,
+      "content": "... (sub content here) ..."
+    }[],
+  "ai-generated-base64-500x500-image": String
+}
+
+The response should be an array of the structure above. Array length must no exceed 5.
+The answer will be parsed with JSON.parse. Do not include any additional info nor explanations that cause an error when being parse as JSON. 
+Contents should be pure texts not markdown.
+`;
+
+    console.log(76);
     
   const result = await model.generateContent(prompt);
+  
+  
   const response = await result.response;
 //   console.log(response);
+  console.log(12);
+  // console.log(response.text());
   
-  const text = response.text();
-  console.log(text);
+  return JSON.parse(
+    `${(response.text().match(/```json(.*?)```/gs) as string[])[0].replace(/```json/,'').replace(/(```)$/,'')}`
+  );
+  
 }
 
 

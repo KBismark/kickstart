@@ -90,7 +90,31 @@ const TopTabScreens = ()=>{
     <NestedFlatListScreenContainer
       onScreen={(index)=>{
         (tabScreenScrollPositions as any).fresh = true;
-        currentActiveTab.name = tabButtons[0].name
+        const tabName = currentActiveTab.name = tabButtons[index-1].name;
+        console.log(tabName);
+        
+        if(!DATA[tabName]){
+          askAI(tabName.toLowerCase()==='explore'?'anything':tabName.toLowerCase()).catch((err)=>{
+            console.log(err);
+            
+          })
+          .then((data)=>{
+            // console.log(data);
+            DATA[tabName] = data;
+            currentActiveTab.runTab[tabName]();
+            // if(currentActiveTab.name === tabName){
+            //   setData(DATA[tabName].map((blog:any)=>{
+            //     return {
+            //         imageSrc: blog['ai-generated-base64-500x500-image']||'null',
+            //         title: blog.title,
+            //         caption: blog.introduction.slice(0,100)
+            //     }
+            //   }))
+            // }
+          })
+        }else{
+          currentActiveTab.runTab[tabName]();
+        }
         // const tabName = tabButtons[index-1].name;
         // const tabData = tabScreenScrollPositions[tabName];
         // if(tabData&&tabData.setScreenScrollPosition){
@@ -114,17 +138,61 @@ const TopTabScreens = ()=>{
 const halfHeight = getScreenHeightPercentageNumber(30);
 const topHeight = getScreenHeightPercentageNumber(20);
 
-
+const DATA:any = {};
 
 function TabScreen({item}:{item: typeof tabButtons['0']}) {
   const {background,white, neutral} = useTheme().colors;
-  const [data,setData] = useState((new Array(5)).fill(dummyArticleData));
+  const [data,setData] = useState<(typeof dummyArticleData)[]>([]);
+  // useState((new Array(5)).fill(dummyArticleData));
+  const forceUpdate = useState({})[1];
   const [scroll,setScroll] = useState(true);
   // const lastIndex = data.length-1;
   const ref = useRef<FlatList>(null);
   
   // enableScroll = scroll;
   const {name:tabName} = item;
+  
+  useEffect(()=>{
+    console.log([currentActiveTab.name, tabName]);
+    
+    if(!DATA[tabName]){
+      tabName === 'Explore' &&
+      askAI('anything').catch((err)=>{
+        console.log(err);
+        
+      })
+      .then((data)=>{
+        // console.log(data);
+        DATA[tabName] = data;
+        if(currentActiveTab.name === tabName){
+          setData(DATA[tabName].map((blog:any)=>{
+            return {
+                imageSrc: blog['ai-generated-base64-500x500-image']||'null',
+                title: blog.title,
+                caption: blog.introduction.slice(0,100)
+            }
+          }))
+        }
+      })
+
+    }else{
+      // if(currentActiveTab.name === tabName){
+      //   setData(DATA[tabName].map((blog:any)=>{
+      //     return {
+      //         imageSrc: blog['ai-generated-base64-500x500-image']||'null',
+      //         title: blog.title,
+      //         caption: blog.introduction.slice(0,100)
+      //     }
+      //   }))
+      // }
+    }
+    return ()=>{
+
+      currentActiveTab.runTab[tabName] = ()=>{};
+      // tabScreenScrollPositions[tabName] = null as any;
+    }
+  },[])
+
   if(!tabScreenScrollPositions[tabName]){
     tabScreenScrollPositions[tabName] = {
       positionY: 0,
@@ -135,8 +203,26 @@ function TabScreen({item}:{item: typeof tabButtons['0']}) {
     };
   }
   itemPaged.onTabOnly[tabName] = (isPaged)=>{
+    
+    console.log(isPaged);
+    
     setScroll(!isPaged);
   };
+  currentActiveTab.runTab[tabName] = ()=>{
+    console.log(!!DATA[tabName], tabName);
+    
+    if(data.length<1&&DATA[tabName]){
+      if(currentActiveTab.name === tabName){
+        setData(DATA[tabName].map((blog:any)=>{
+          return {
+              imageSrc: blog['ai-generated-base64-500x500-image']||'null',
+              title: blog.title,
+              caption: blog.introduction.slice(0,100)
+          }
+        }))
+      }
+    }
+  }
   
   // overlayControl.show = (s)=>{
   //   console.log(s);
@@ -275,14 +361,20 @@ const Greetings = ({onMenu}: GreetProps)=>{
                 <ProfileImage width={35} height={35} />
                 {/* <Heading type='h4'>{'@KBismark'}</Heading> */}
                 <Button onPress={()=>{
-                  askAI().catch((err)=>{
-                    console.log(err);
+                  console.log(DATA);
+                  
+                  // askAI('history').catch((err)=>{
+                  //   console.log(err);
                     
-                  })
-                  openAI_Image().catch((err)=>{
-                    console.log(err);
+                  // })
+                  // .then((data)=>{
+                  //   console.log(data);
                     
-                  })
+                  // })
+                  // openAI_Image().catch((err)=>{
+                  //   console.log(err);
+                    
+                  // })
                   
                 }} active={true} title='Log in' style={{paddingVertical: 8,paddingHorizontal: 20}} />
             </View>

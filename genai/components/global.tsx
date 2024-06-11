@@ -75,7 +75,7 @@ export const getScreenPercentageNumber = (percent:number)=>(percent/100)*ScreenW
 export const getScreenHeightPercentageNumber = (percent:number)=>(percent/100)*ScreenHeight;
 export const overlayControl: {show:(show:boolean)=>void} = {} as any;
 export const tabScreenScrollPositions: {[k:string]: {positionY:number;setScreenScrollPosition:(position:number,animate?:boolean)=>void}} = {} as any;
-export const currentActiveTab = {name: ''}
+export const currentActiveTab: {name:string, runTab: {[k:string]: ()=>void} }= {name: '', runTab: {}};
 export const itemPaged: {
     onPage: {[k:string]: ((isPaged: boolean)=>void)};
     onTabOnly: {[k:string]: ((isPaged: boolean)=>void)}
