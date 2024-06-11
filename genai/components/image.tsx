@@ -31,7 +31,7 @@ export function ImageView({uri,style,styleChanged}:Props){
     // <Image contentFit='cover' transition={build.transition as any} cachePolicy={'memory-disk'} style={build.style} source={uri} />
     // {'uri':uri}
     return (
-        <ExpoImage contentFit='cover' transition={build.transition as any} cachePolicy={'memory-disk'} style={build.style} source={img} />
+        <ExpoImage contentFit='cover' transition={build.transition as any} cachePolicy={'memory-disk'} style={build.style} source={{uri: uri||'null'}} />
     )
   }
 
