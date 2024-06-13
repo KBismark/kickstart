@@ -1,12 +1,16 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+// import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 
-import { useColorScheme } from '@/components/useColorScheme';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { useThemeColors } from '@/constants/Colors';
+import { View } from 'react-native';
+import { Provider } from 'react-redux'
+import store from '@/store/store';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -15,7 +19,7 @@ export {
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(tabs)',
+  initialRouteName: 'index',
 };
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -45,15 +49,34 @@ export default function RootLayout() {
   return <RootLayoutNav />;
 }
 
-function RootLayoutNav() {
-  const colorScheme = useColorScheme();
 
+function RootLayoutNav() {
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-      </Stack>
-    </ThemeProvider>
+    <SafeAreaProvider>
+        {/* <AppThemeProvider> */}
+          {/* <StatusBar style='dark' /> */}
+          <Provider store={store}>
+          <App />
+          </Provider>
+          
+          
+      {/* </AppThemeProvider> */}
+    </SafeAreaProvider>
   );
+}
+
+
+const App = ()=>{
+  const {background} = useThemeColors()
+  return (
+    <View style={{backgroundColor: background,flex: 1}}>
+      <Stack>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="category/[id]" options={{ headerShown: false }} />
+        <Stack.Screen name="user/[id]" options={{ headerShown: false, animation: 'fade' }} />
+        <Stack.Screen name="singles/[id]" options={{ headerShown: false, animation: 'fade' }} />
+        {/* <Stack.Screen name="modal" options={{ presentation: 'modal' }} /> */}
+      </Stack>
+    </View>
+  )
 }
