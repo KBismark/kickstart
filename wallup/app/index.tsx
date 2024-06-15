@@ -11,6 +11,7 @@ import { addPost } from "@/store/slices";
 import { NonTriggerData, serverURL } from "@/constants";
 import { useSelector } from "react-redux";
 import { DummyPost, CatItems } from "@/constants/data";
+import { IntitialScreen } from "@/screens/initial";
 
 
 
@@ -21,13 +22,14 @@ export default function Home(){
     const posts = useSelector<RootStateStore,RootStateStore['posts']['value']>((state)=>{
         return state.posts.value
     });
+    const [top6Selected, setTop6Selection] = useState(false)
 
     useEffect(()=>{
-        if(postsInfo.count<1){
+        if(top6Selected&&postsInfo.count<1){
             fetchPosts();
         }
         
-    },[])
+    },[top6Selected])
     
     const {posts: postsInfo} = NonTriggerData;
     const getUsernames = ()=>{
@@ -57,6 +59,9 @@ export default function Home(){
         })
     }
 
+    if(!top6Selected){
+        return <IntitialScreen onDone={()=>setTop6Selection(true)} />
+    }
     
 
     const getBottomSheetRef = ()=>bottomSheetRef;
@@ -64,31 +69,6 @@ export default function Home(){
         bottomSheetRef.current?.open();
     }
    
-    const content: HomeItemProps[] = [
-        {
-            username: 'KBismark', image: require('../assets/images/nature.jpg'),
-            data: [
-                // {},
-                {image:  require('../assets/images/image1.jpeg')},
-                {image:  require('../assets/images/image2.jpeg')},
-                {image:  require('../assets/images/image3.jpeg')},
-                {image:  require('../assets/images/image4.jpeg')},
-                {image:  require('../assets/images/image5.jpeg')},
-                {image:  require('../assets/images/image6.jpeg')},
-            ]
-        },
-        {
-            username: 'WallpaperZone', image: require('../assets/images/music.jpg'),
-            data: [
-                {image:  require('../assets/images/image7.jpeg')},
-                {image:  require('../assets/images/image8.jpeg')},
-                {image:  require('../assets/images/image2.jpeg')},
-                {image:  require('../assets/images/image6.jpeg')},
-                {image:  require('../assets/images/image1.jpeg')},
-                {image:  require('../assets/images/image4.jpeg')},
-            ]
-        }
-    ];
     
     return (
         <View style={[styles.container, {backgroundColor: background}]}>

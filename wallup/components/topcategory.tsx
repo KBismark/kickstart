@@ -36,7 +36,7 @@ export const CategoryItem = (item: Props['data'][0]&{inColumns?:boolean;})=>{
         router.push(`/category/${item.name}`)
     }
     return (
-        <TouchableOpacity onPress={onPress} style={!item.inColumns?styles.item:[styles.item,{flexDirection: 'column', marginBottom: 25}]}>
+        <TouchableOpacity onPress={onPress} style={!item.inColumns?styles.item:[styles.item,{flexDirection: 'column', marginBottom: 25, marginRight: 10, marginLeft: 10}]}>
             <ImageSpace width={size} height={size} radius={size} loader={false} uri={item.uri} image={item.image} />
             <Text style={[styles.itemText, !item.inColumns?{color: text}: {color: text, marginLeft: 0, marginTop: 10}]}>{item.name}</Text>
         </TouchableOpacity>

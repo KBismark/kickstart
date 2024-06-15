@@ -62,7 +62,7 @@ export function ParallaxCorousel({title, data}: {title: string; data: (string|nu
 
   return (
     <SafeAreaView style={{ flex: 1,   }}>
-        <SafeAreaView style={{alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between'}}>
+        <View style={{alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between'}}>
             <TouchableOpacity onPress={onBack} style={styles.header}>
                 <Feather name='arrow-left' size={27} color={text} />
                 <Text style={[styles.textBold, {color: text}]}>{title}</Text>
@@ -80,7 +80,7 @@ export function ParallaxCorousel({title, data}: {title: string; data: (string|nu
                 </ExpoBlurView>
             </TouchableOpacity>
             </View> */}
-        </SafeAreaView>
+        </View>
       <Carousel
         
         loop={data.length>1}
@@ -216,7 +216,7 @@ const CustomItem: React.FC<ItemProps> = ({ source, animationValue }) => {
       {
         imageloaded &&
         <View style={styles.saveContainerInit}>
-          <TouchableOpacity style={styles.saveButton}>
+          <TouchableOpacity style={[styles.saveButton, {marginRight: 0}]}>
             <ExpoBlurView style={[styles.saveButtonBlur, {width: 60, height: 60}]} intensity={60} >
                 <Feather name='download' size={28} color={text} style={{marginTop: -3}} />
             </ExpoBlurView>
