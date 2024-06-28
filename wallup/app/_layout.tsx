@@ -11,6 +11,7 @@ import { useThemeColors } from '@/constants/Colors';
 import { View } from 'react-native';
 import { Provider } from 'react-redux'
 import store from '@/store/store';
+import { StatusBar } from 'expo-status-bar';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -53,14 +54,11 @@ export default function RootLayout() {
 function RootLayoutNav() {
   return (
     <SafeAreaProvider>
-        {/* <AppThemeProvider> */}
-          {/* <StatusBar style='dark' /> */}
+          
           <Provider store={store}>
-          <App />
+            <StatusBar style='light' />
+            <App />
           </Provider>
-          
-          
-      {/* </AppThemeProvider> */}
     </SafeAreaProvider>
   );
 }

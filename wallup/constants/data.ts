@@ -50,7 +50,34 @@ type Posts = {
             {image:  require('../assets/images/image4.jpeg')},
         ]
     },
-
+    'WallpaperGirl': {
+        username: 'WallpaperGirl', 
+        image: require('../assets/images/music.jpg'),
+        uri: '',
+        userLink: '',
+        data: [
+            {image:  require('../assets/images/image3.jpeg')},
+            {image:  require('../assets/images/image5.jpeg')},
+            {image:  require('../assets/images/image4.jpeg')},
+            {image:  require('../assets/images/image6.jpeg')},
+            {image:  require('../assets/images/image7.jpeg')},
+            {image:  require('../assets/images/image2.jpeg')},
+        ]
+    },
+    'PhoneWallpaper': {
+        username: 'PhoneWallpaper', 
+        image: require('../assets/images/music.jpg'),
+        uri: '',
+        userLink: '',
+        data: [
+            {image:  require('../assets/images/image8.jpeg')},
+            {image:  require('../assets/images/image6.jpeg')},
+            {image:  require('../assets/images/image1.jpeg')},
+            {image:  require('../assets/images/image4.jpeg')},
+            {image:  require('../assets/images/image3.jpeg')},
+            {image:  require('../assets/images/image5.jpeg')},
+        ]
+    },
   }
 
 
